@@ -2,13 +2,20 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Formulaire de recommandations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Recommandations d'Entraînement</title>
 </head>
 <body>
-    <h1>Formulaire de recommandations personnalisées</h1>
+    <h1>Entrez vos données pour obtenir une recommandation d'entraînement</h1>
     <form action="/recommandation" method="POST">
+        <label for="age">Âge :</label>
+        <input type="number" id="age" name="age" required><br><br>
+
         <label for="sexe">Sexe :</label>
-        <input type="text" id="sexe" name="sexe" required><br><br>
+        <select id="sexe" name="sexe" required>
+            <option value="homme">Homme</option>
+            <option value="femme">Femme</option>
+        </select><br><br>
 
         <label for="poids">Poids (kg) :</label>
         <input type="number" id="poids" name="poids" required><br><br>
@@ -16,16 +23,22 @@
         <label for="taille">Taille (cm) :</label>
         <input type="number" id="taille" name="taille" required><br><br>
 
-        <label for="age">Âge :</label>
-        <input type="number" id="age" name="age" required><br><br>
-
-        <label for="activite">Activité :</label>
-        <input type="text" id="activite" name="activite" required><br><br>
-
         <label for="objectif">Objectif :</label>
-        <input type="text" id="objectif" name="objectif" required><br><br>
+        <select id="objectif" name="objectif" required>
+            <option value="perte de poids">Perte de poids</option>
+            <option value="gain musculaire">Gain musculaire</option>
+        </select><br><br>
 
-        <input type="submit" value="Obtenir recommandations">
+        <label for="activite">Niveau d'activité :</label>
+        <select id="activite" name="activite" required>
+            <option value="faible">Faible</option>
+            <option value="moderee">Modéré</option>
+            <option value="eleve">Élevé</option>
+        </select><br><br>
+
+        <button type="submit">Obtenir la recommandation</button>
     </form>
+
+    <div id="resultat"></div>
 </body>
 </html>
