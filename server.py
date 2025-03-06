@@ -63,6 +63,16 @@ def generer_seance(objectif, utilisateur_data):
     return prediction[0]
 
 
+def calculer_proposition_sommeil(sommeil_dernieres_semaines):
+    moyenne_sommeil = sum(sommeil_dernieres_semaines) / len(sommeil_dernieres_semaines)
+    if moyenne_sommeil < 7:
+        recommandation = "Essayez d'augmenter votre sommeil à au moins 7 heures par nuit."
+    else:
+        recommandation = "Continuez à maintenir un bon rythme de sommeil."
+    
+    return recommandation
+
+
 @app.route('/')
 def home():
     return render_template('formulaire.html') 
@@ -72,6 +82,10 @@ def recommander():
     if request.is_json: 
         data = request.get_json() 
 
+        sommeil_dernieres_semaines = data.get("sommeil_dernieres_semaines", [])
+        
+        proposition_sommeil = calculer_proposition_sommeil(sommeil_dernieres_semaines)
+        
         bmr = calcul_bmr(data["sexe"], data["poids"], data["taille"], data["age"])
         besoins = besoins_caloriques(bmr, data["activite"])
         besoins_ajustes = ajuster_besoins_caloriques(besoins, data["objectif"], data["activite"])
@@ -83,7 +97,8 @@ def recommander():
         return jsonify({
             "besoins_caloriques": round(besoins_ajustes, 2),
             "menu": repas,
-            "seance": seance
+            "seance": seance,
+            "proposition_sommeil": proposition_sommeil
         })
 
     else:
@@ -103,6 +118,22 @@ def recommander():
 
         besoins_caloriques = round(poids * 24 * 1.2, 2)
 
+        sommeil_jours = [
+            float(request.form['sommeil_jour_1']),
+            float(request.form['sommeil_jour_2']),
+            float(request.form['sommeil_jour_3']),
+            float(request.form['sommeil_jour_4']),
+            float(request.form['sommeil_jour_5'])
+        ]
+
+        proposition_sommeil = calculer_proposition_sommeil(sommeil_jours)
+
+        seances_passees = request.form['seances_passees'].split(',')
+        
+        if len(seances_passees) > 3:
+            besoins_caloriques *= 1.1
+            proposition_sommeil = "Augmentez votre sommeil pour récupérer de vos séances intenses."
+        
         utilisateur_data = pd.DataFrame([{'age': age, 'sexe': sexe, 'poids': poids, 'taille': taille, 'activite': activite_num, 'objectif': 1 if objectif == 'gain musculaire' else 0}])
         repas = generer_menu(besoins_caloriques, utilisateur_data)
         seance = generer_seance(objectif, utilisateur_data)
@@ -112,6 +143,7 @@ def recommander():
                                entrainement_recommande=round(prediction[0], 2),
                                menu=repas,
                                seance=seance,
+                               proposition_sommeil=proposition_sommeil,
                                message="Votre entraînement est recommandé à " + str(round(prediction[0] * 100, 2)) + "% d'efficacité")
 
 if __name__ == '__main__':
