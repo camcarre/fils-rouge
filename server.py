@@ -1,10 +1,33 @@
 from flask import Flask, request, render_template, jsonify
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+from services.analyse import calcul_bmr, besoins_caloriques
 from services.calories import ajuster_besoins_caloriques
+from services.menu import generer_menu
+from services.seance import generer_seance
 
 app = Flask(__name__)
+
+user_data = pd.read_csv('data/user_data.csv')
+
+X = user_data[['age', 'sexe', 'poids', 'taille', 'activite', 'objectif']]
+y_menu = user_data['recommandation_menu']
+y_seance = user_data['recommandation_seance']
+
+X = pd.get_dummies(X, columns=['sexe', 'activite', 'objectif'])
+
+dummy_columns = X.columns
+
+X_train, X_test, y_train_menu, y_test_menu = train_test_split(X, y_menu, test_size=0.2, random_state=42)
+X_train, X_test, y_train_seance, y_test_seance = train_test_split(X, y_seance, test_size=0.2, random_state=42)
+
+menu_model = RandomForestClassifier(n_estimators=100, random_state=42)
+menu_model.fit(X_train, y_train_menu)
+
+seance_model = RandomForestClassifier(n_estimators=100, random_state=42)
+seance_model.fit(X_train, y_train_seance)
 
 data = {
     "age": [25, 30, 22, 28, 35],
@@ -21,35 +44,24 @@ df = pd.DataFrame(data)
 X = df.drop(columns=["entraineur_recommande"]) 
 y = df["entraineur_recommande"]
 
-model = LinearRegression()
+model = RandomForestRegressor(n_estimators=100, random_state=42)
 
 model.fit(X, y)
 
-def calcul_bmr(sexe, poids, taille, age):
-    if sexe == 0:
-        return 66.5 + (13.75 * poids) + (5.003 * taille) - (6.75 * age)
-    else: 
-        return 655 + (9.563 * poids) + (1.850 * taille) - (4.676 * age)
 
-def besoins_caloriques(bmr, activite):
-    if activite == "faible":
-        return bmr * 1.2 
-    elif activite == "moderee":
-        return bmr * 1.55 
-    elif activite == "eleve":
-        return bmr * 1.9 
-    else:
-        return bmr 
+def generer_menu(besoins_caloriques, utilisateur_data):
+    utilisateur_data = pd.get_dummies(utilisateur_data, columns=['sexe', 'activite', 'objectif'])
+    utilisateur_data = utilisateur_data.reindex(columns=dummy_columns, fill_value=0)
+    prediction = menu_model.predict(utilisateur_data)
+    return prediction[0]
 
 
-def generer_menu(besoins_caloriques):
-    return f"Menu avec {besoins_caloriques} calories : 3 repas équilibrés."
+def generer_seance(objectif, utilisateur_data):
+    utilisateur_data = pd.get_dummies(utilisateur_data, columns=['sexe', 'activite', 'objectif'])
+    utilisateur_data = utilisateur_data.reindex(columns=dummy_columns, fill_value=0)
+    prediction = seance_model.predict(utilisateur_data)
+    return prediction[0]
 
-def generer_seance(objectif, activite):
-    if objectif == "perte de poids":
-        return f"Entraînement cardio de {activite} intensité pour la perte de poids."
-    else:
-        return f"Entraînement de renforcement musculaire pour le gain musculaire."
 
 @app.route('/')
 def home():
@@ -64,8 +76,9 @@ def recommander():
         besoins = besoins_caloriques(bmr, data["activite"])
         besoins_ajustes = ajuster_besoins_caloriques(besoins, data["objectif"], data["activite"])
 
-        repas = generer_menu(besoins_ajustes)
-        seance = generer_seance(data["objectif"], data["activite"])
+        utilisateur_data = pd.DataFrame([data])
+        repas = generer_menu(besoins_ajustes, utilisateur_data)
+        seance = generer_seance(data["objectif"], utilisateur_data)
 
         return jsonify({
             "besoins_caloriques": round(besoins_ajustes, 2),
@@ -90,9 +103,15 @@ def recommander():
 
         besoins_caloriques = round(poids * 24 * 1.2, 2)
 
+        utilisateur_data = pd.DataFrame([{'age': age, 'sexe': sexe, 'poids': poids, 'taille': taille, 'activite': activite_num, 'objectif': 1 if objectif == 'gain musculaire' else 0}])
+        repas = generer_menu(besoins_caloriques, utilisateur_data)
+        seance = generer_seance(objectif, utilisateur_data)
+
         return render_template('resultat.html', 
                                besoins_caloriques=besoins_caloriques, 
                                entrainement_recommande=round(prediction[0], 2),
+                               menu=repas,
+                               seance=seance,
                                message="Votre entraînement est recommandé à " + str(round(prediction[0] * 100, 2)) + "% d'efficacité")
 
 if __name__ == '__main__':
