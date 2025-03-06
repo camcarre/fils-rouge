@@ -1,9 +1,0 @@
-age,sexe,poids,taille,activite,objectif,recommandation_menu,recommandation_seance,sommeil_dernieres_semaines,seances_passees
-25,homme,70,175,moderee,gain_muscle,"Omelette et pain complet, Poulet-riz-légumes, Soupe de légumes","Musculation haut du corps, Squats et fentes","[7, 6.5, 7.5, 8, 7, 6.5, 7]","Course à pied 30 min"
-30,femme,60,160,sédentaire,perte_poids,"Yaourt, granola et miel, Salade quinoa avocat, Tofu sauté légumes","Course à pied 30 min, HIIT 20 min","[6, 5.5, 6.5, 7, 6, 5.5, 6]","Course à pied 30 min"
-22,homme,80,180,élevée,gain_muscle,"Smoothie banane protéiné, Pâtes complètes saumon, Omelette aux champignons","Pompes et tractions, Musculation haut du corps","[8, 7.5, 8, 8.5, 8, 7.5, 8]","Course à pied 30 min"
-28,femme,75,170,moderee,perte_poids,"Omelette et pain complet, Salade quinoa avocat, Soupe de légumes","Natation 45 min, Course à pied 30 min","[7, 6.5, 7, 7.5, 7, 6.5, 7]"," Course à pied 30 min, HIIT 20 min"
-35,homme,65,165,faible,équilibre,"Yaourt, granola et miel, Poulet-riz-légumes, Tofu sauté légumes","Yoga 45 min, Pilates 30 min","[6, 5.5, 6, 6.5, 6, 5.5, 6]","Course à pied 30 min, HIIT 20 min"
-30,femme,65,160,moderee,gain_muscle,"Salade de quinoa, Poulet grillé, Smoothie protéiné","Yoga 30 min, Musculation bas du corps","[7, 6.5, 7, 7.5, 7, 6.5, 7]","Course à pied 30 min"
-28,homme,75,175,sédentaire,perte_poids,"Omelette, Légumes grillés, Soupe de lentilles","Natation 45 min, Course à pied 20 min","[6, 5.5, 6, 6.5, 6, 5.5, 6]","Course à pied 20 min"
-35,femme,70,165,élevée,gain_muscle,"Pâtes complètes, Saumon grillé, Salade de fruits","Musculation haut du corps, HIIT 30 min","[8, 7.5, 8, 8.5, 8, 7.5, 8]","Course à pied 30 min"
