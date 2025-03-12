@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -7,14 +7,27 @@ from services.analyse import calcul_bmr, besoins_caloriques
 from services.calories import ajuster_besoins_caloriques
 from services.menu import generer_menu
 from services.seance import generer_seance
+import sqlite3
 
 app = Flask(__name__)
 
-user_data = pd.read_csv('data/user_data.csv')
+# user_data = pd.read_csv('data/user_data.csv')
 
-X = user_data[['age', 'sexe', 'poids', 'taille', 'activite', 'objectif']]
-y_menu = user_data['recommandation_menu']
-y_seance = user_data['recommandation_seance']
+X = pd.DataFrame({
+    'age': [25, 30, 22, 28, 35],
+    'sexe': [0, 1, 0, 0, 1], 
+    'poids': [70, 60, 80, 75, 65],
+    'taille': [175, 160, 180, 170, 165],
+    'objectif': [0, 1, 0, 1, 0], 
+    'activite': [1, 2, 1, 3, 2],  
+    'recommandation_menu': [1, 2, 1, 2, 1],
+    'recommandation_seance': [1, 2, 1, 2, 1]
+})
+
+y_menu = X['recommandation_menu']
+y_seance = X['recommandation_seance']
+
+X = X.drop(columns=['recommandation_menu', 'recommandation_seance'])
 
 X = pd.get_dummies(X, columns=['sexe', 'activite', 'objectif'])
 
@@ -63,19 +76,71 @@ def generer_seance(objectif, utilisateur_data):
     return prediction[0]
 
 
+def generer_conseils(user_id):
+    conn = sqlite3.connect('user_data.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+    user_data = c.fetchone()
+    conn.close()
+
+    if user_data:
+        return {
+            'name': user_data[1],
+            'email': user_data[2],
+            'created_at': user_data[3]
+        }
+    else:
+        return None
+
+
 def calculer_proposition_sommeil(sommeil_dernieres_semaines):
+    print(f"Sleep data for last weeks: {sommeil_dernieres_semaines}")  # Debugging statement
     moyenne_sommeil = sum(sommeil_dernieres_semaines) / len(sommeil_dernieres_semaines)
     if moyenne_sommeil < 7:
         recommandation = "Essayez d'augmenter votre sommeil à au moins 7 heures par nuit."
     else:
         recommandation = "Continuez à maintenir un bon rythme de sommeil."
-    
+    print(f"Sleep recommendation: {recommandation}")  # Debugging statement
     return recommandation
 
 
 @app.route('/')
 def home():
-    return render_template('formulaire.html') 
+    return redirect('/recommandation')
+
+@app.route('/recommandation')
+def afficher_recommandations():
+    conn = sqlite3.connect('user_data.db')
+    c = conn.cursor()
+    c.execute('SELECT sexe, poids, taille, objectif, activite FROM users ORDER BY created_at DESC LIMIT 1')
+    dernier_utilisateur = c.fetchone()
+    conn.close()
+
+    if dernier_utilisateur:
+        user_id = dernier_utilisateur[0]
+        user_data = pd.DataFrame([{
+            'sexe': dernier_utilisateur[0],
+            'poids': dernier_utilisateur[1],
+            'taille': dernier_utilisateur[2],
+            'objectif': dernier_utilisateur[3],
+            'activite': dernier_utilisateur[4]
+        }])
+
+        bmr = calcul_bmr(user_data['sexe'][0], user_data['poids'][0], user_data['taille'][0], 25)
+        besoins = besoins_caloriques(bmr, user_data['activite'][0])
+        besoins_ajustes = ajuster_besoins_caloriques(besoins, user_data['objectif'][0], user_data['activite'][0])
+
+        repas = generer_menu(besoins_ajustes, user_data)
+        seance = generer_seance(user_data['objectif'][0], user_data)
+
+        return render_template('resultat.html',
+                             besoins_caloriques=round(besoins_ajustes, 2),
+                             menu=repas,
+                             seance=seance,
+                             proposition_sommeil="Votre recommandation de sommeil")
+    else:
+        return "Aucun utilisateur trouvé dans la base de données."
+
 
 @app.route('/recommandation', methods=['POST'])
 def recommander():
