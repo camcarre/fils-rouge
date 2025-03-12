@@ -94,13 +94,13 @@ def generer_conseils(user_id):
 
 
 def calculer_proposition_sommeil(sommeil_dernieres_semaines):
-    print(f"Sleep data for last weeks: {sommeil_dernieres_semaines}")  # Debugging statement
+    print(f"Sleep data for last weeks: {sommeil_dernieres_semaines}")
     moyenne_sommeil = sum(sommeil_dernieres_semaines) / len(sommeil_dernieres_semaines)
     if moyenne_sommeil < 7:
         recommandation = "Essayez d'augmenter votre sommeil à au moins 7 heures par nuit."
     else:
         recommandation = "Continuez à maintenir un bon rythme de sommeil."
-    print(f"Sleep recommendation: {recommandation}")  # Debugging statement
+    print(f"Sleep recommendation: {recommandation}")
     return recommandation
 
 
