@@ -1,5 +1,8 @@
 import requests
 import sqlite3
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 API_URL = 'https://sandbox-api.sahha.ai/api/v1/profile/biomarker/WAJDbLDMeZWbT3AAYEJOE49Ijlg2'
 HEADERS = {
@@ -17,7 +20,8 @@ response = requests.get(API_URL, headers=HEADERS, params=params)
 
 if response.status_code == 200:
     data = response.json()
-    conn = sqlite3.connect('user_data.db')
+    logging.info('Data fetched successfully from the API.')
+    conn = sqlite3.connect('/Users/camcam/Documents/taffpro/fils-rouge/api/user_data.db')
     c = conn.cursor()
     c.execute('DELETE FROM metrics')
     for item in data:
@@ -27,6 +31,6 @@ if response.status_code == 200:
                   (user_id, item.get('category', 'N/A'), item.get('type', 'N/A'), item.get('periodicity', 'N/A'), item.get('aggregation', 'N/A'), item.get('value', 'N/A'), item.get('unit', 'N/A'), item.get('valueType', 'N/A'), item['startDateTime'], item['endDateTime']))
     conn.commit()
     conn.close()
-    print('Metrics table cleared and data inserted successfully.')
+    logging.info('Metrics table cleared and data inserted successfully.')
 else:
-    print(f'Error: {response.status_code} - {response.text}')
+    logging.error(f'Error: {response.status_code} - {response.text}')
