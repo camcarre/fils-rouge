@@ -11,7 +11,6 @@ import sqlite3
 
 app = Flask(__name__)
 
-# user_data = pd.read_csv('data/user_data.csv')
 
 X = pd.DataFrame({
     'age': [25, 30, 22, 28, 35],
@@ -66,14 +65,26 @@ def generer_menu(besoins_caloriques, utilisateur_data):
     utilisateur_data = pd.get_dummies(utilisateur_data, columns=['sexe', 'activite', 'objectif'])
     utilisateur_data = utilisateur_data.reindex(columns=dummy_columns, fill_value=0)
     prediction = menu_model.predict(utilisateur_data)
-    return prediction[0]
+    
+    if besoins_caloriques < 1800:
+        return 'Menu léger : Salade verte, poulet grillé, et fruits frais.'
+    elif besoins_caloriques < 2200:
+        return 'Menu équilibré : Quinoa, légumes sautés, et poisson grillé.'
+    else:
+        return 'Menu copieux : Steak, pommes de terre au four, et dessert au chocolat.'
 
 
 def generer_seance(objectif, utilisateur_data):
     utilisateur_data = pd.get_dummies(utilisateur_data, columns=['sexe', 'activite', 'objectif'])
     utilisateur_data = utilisateur_data.reindex(columns=dummy_columns, fill_value=0)
     prediction = seance_model.predict(utilisateur_data)
-    return prediction[0]
+    
+    if objectif == 'perte de poids':
+        return 'Séance de cardio de 30 minutes recommandée.'
+    elif objectif == 'prise de muscle':
+        return 'Séance de musculation de 45 minutes recommandée.'
+    else:
+        return 'Séance d’entraînement mixte de 40 minutes recommandée.'
 
 
 def generer_conseils(user_id):
@@ -133,11 +144,35 @@ def afficher_recommandations():
         repas = generer_menu(besoins_ajustes, user_data)
         seance = generer_seance(user_data['objectif'][0], user_data)
 
+        objectif_utilisateur = user_data['objectif'][0]
+        if objectif_utilisateur == 'perte de poids':
+            entrainement_recommande = 'Entraînement cardio recommandé pour la perte de poids.'
+        elif objectif_utilisateur == 'prise de muscle':
+            entrainement_recommande = 'Entraînement de musculation recommandé pour la prise de muscle.'
+        else:
+            entrainement_recommande = 'Entraînement mixte recommandé pour le maintien.'
+
+        if besoins_ajustes < 2000:
+            recommandation_sommeil = 'Essayez de dormir au moins 7 à 8 heures par nuit.'
+        elif besoins_ajustes < 2500:
+            recommandation_sommeil = 'Un sommeil de 7 heures est recommandé.'
+        else:
+            recommandation_sommeil = 'Un sommeil de 6 à 7 heures est suffisant.'
+
+        conn = sqlite3.connect('user_data.db')
+        c = conn.cursor()
+
+        c.execute('''INSERT INTO recommendations (besoins_caloriques, entrainement, menu, seance, sommeil) VALUES (?, ?, ?, ?, ?)''',
+                  (round(besoins_ajustes, 2), entrainement_recommande, repas, seance, recommandation_sommeil))
+        conn.commit()
+        conn.close()
+
         return render_template('resultat.html',
                              besoins_caloriques=round(besoins_ajustes, 2),
                              menu=repas,
                              seance=seance,
-                             proposition_sommeil="Votre recommandation de sommeil")
+                             proposition_sommeil=recommandation_sommeil,
+                             entrainement_recommande=entrainement_recommande)
     else:
         return "Aucun utilisateur trouvé dans la base de données."
 
@@ -158,6 +193,14 @@ def recommander():
         utilisateur_data = pd.DataFrame([data])
         repas = generer_menu(besoins_ajustes, utilisateur_data)
         seance = generer_seance(data["objectif"], utilisateur_data)
+
+        conn = sqlite3.connect('user_data.db')
+        c = conn.cursor()
+
+        c.execute('''INSERT INTO recommendations (besoins_caloriques, entrainement, menu, seance, sommeil) VALUES (?, ?, ?, ?, ?)''',
+                  (round(besoins_ajustes, 2), "Entraînement recommandé", repas, seance, proposition_sommeil))
+        conn.commit()
+        conn.close()
 
         return jsonify({
             "besoins_caloriques": round(besoins_ajustes, 2),
@@ -202,6 +245,14 @@ def recommander():
         utilisateur_data = pd.DataFrame([{'age': age, 'sexe': sexe, 'poids': poids, 'taille': taille, 'activite': activite_num, 'objectif': 1 if objectif == 'gain musculaire' else 0}])
         repas = generer_menu(besoins_caloriques, utilisateur_data)
         seance = generer_seance(objectif, utilisateur_data)
+
+        conn = sqlite3.connect('user_data.db')
+        c = conn.cursor()
+
+        c.execute('''INSERT INTO recommendations (besoins_caloriques, entrainement, menu, seance, sommeil) VALUES (?, ?, ?, ?, ?)''',
+                  (round(besoins_caloriques, 2), round(prediction[0], 2), repas, seance, proposition_sommeil))
+        conn.commit()
+        conn.close()
 
         return render_template('resultat.html', 
                                besoins_caloriques=besoins_caloriques, 
