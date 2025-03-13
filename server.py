@@ -261,6 +261,6 @@ def recommander():
                                seance=seance,
                                proposition_sommeil=proposition_sommeil,
                                message="Votre entraînement est recommandé à " + str(round(prediction[0] * 100, 2)) + "% d'efficacité")
-
+                               
 if __name__ == '__main__':
     app.run(debug=True)
