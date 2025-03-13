@@ -21,6 +21,8 @@ menu = {
 def generer_menu(besoins):
     repas = {}
     for type_repas, options in menu.items():
-        choix = random.choice(options)
-        repas[type_repas] = choix["nom"]
+        options_valides = [o for o in options if o['calories'] <= besoins / 3]
+        if options_valides:
+            choix = random.choice(options_valides)
+            repas[type_repas] = choix["nom"]
     return repas

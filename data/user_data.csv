@@ -1,6 +1,0 @@
-age,sexe,poids,taille,activite,objectif,recommandation_menu,recommandation_seance,sommeil_dernieres_semaines
-25,homme,70,175,moderee,gain_muscle,"Omelette et pain complet, Poulet-riz-légumes, Soupe de légumes","Musculation haut du corps, Squats et fentes","[7, 6.5, 7.5, 8, 7, 6.5, 7]"
-30,femme,60,160,sédentaire,perte_poids,"Yaourt, granola et miel, Salade quinoa avocat, Tofu sauté légumes","Course à pied 30 min, HIIT 20 min","[6, 5.5, 6.5, 7, 6, 5.5, 6]"
-22,homme,80,180,élevée,gain_muscle,"Smoothie banane protéiné, Pâtes complètes saumon, Omelette aux champignons","Pompes et tractions, Musculation haut du corps","[8, 7.5, 8, 8.5, 8, 7.5, 8]"
-28,femme,75,170,moderee,perte_poids,"Omelette et pain complet, Salade quinoa avocat, Soupe de légumes","Natation 45 min, Course à pied 30 min","[7, 6.5, 7, 7.5, 7, 6.5, 7]"
-35,homme,65,165,faible,équilibre,"Yaourt, granola et miel, Poulet-riz-légumes, Tofu sauté légumes","Yoga 45 min, Pilates 30 min","[6, 5.5, 6, 6.5, 6, 5.5, 6]"
