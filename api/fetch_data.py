@@ -1,6 +1,7 @@
 import requests
 import sqlite3
 import logging
+from server import afficher_recommandations
 
 logging.basicConfig(level=logging.INFO)
 
@@ -25,12 +26,14 @@ if response.status_code == 200:
     c = conn.cursor()
     c.execute('DELETE FROM metrics')
     for item in data:
-        user_id = 1  
+        user_id = 1
         c.execute('''INSERT INTO metrics (user_id, category, type, periodicity, aggregation, value, unit, valueType, startDateTime, endDateTime)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                  (user_id, item.get('category', 'N/A'), item.get('type', 'N/A'), item.get('periodicity', 'N/A'), item.get('aggregation', 'N/A'), item.get('value', 'N/A'), item.get('unit', 'N/A'), item.get('valueType', 'N/A'), item['startDateTime'], item['endDateTime']))
+                  (user_id, item.get('category', 'N/A'), item.get('type', 'N/A'), item.get('periodicity', 'N/A'), item.get('aggregation', 'N/A'), item.get('value', 'N/A'), item.get('unit', 'N/A'), item.get('valueType', 'N/A'), item.get('startDateTime', 'N/A'), item.get('endDateTime', 'N/A')))
+    
     conn.commit()
     conn.close()
     logging.info('Metrics table cleared and data inserted successfully.')
+    afficher_recommandations()
 else:
     logging.error(f'Error: {response.status_code} - {response.text}')
