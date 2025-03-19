@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accueil - Coach Sportif</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.carousel-track');
+            let scrollAmount = 0;
+            const scrollStep = 1; 
+            const scrollInterval = 20;
+
+            function startScroll() {
+                scrollAmount += scrollStep;
+                if (scrollAmount >= track.scrollWidth - track.clientWidth) {
+                    scrollAmount = 0;
+                }
+                track.scrollTo({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+
+            setInterval(startScroll, scrollInterval);
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -21,6 +42,16 @@
             <p>Découvrez des recommandations personnalisées pour votre bien-être</p>
         </section>
 
+        <div class="image-carousel">
+            <div class="carousel-track">
+                <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="Image 1">
+                <img src="{{ url_for('static', filename='images/image2.jpg') }}" alt="Image 2">
+                <img src="{{ url_for('static', filename='images/image3.jpg') }}" alt="Image 3">
+                <img src="{{ url_for('static', filename='images/image4.jpg') }}" alt="Image 4">
+                <img src="{{ url_for('static', filename='images/image5.jpg') }}" alt="Image 5">
+            </div>
+        </div>
+
         <section class="section">
             <h2>Pourquoi nous choisir ?</h2>
             <div class="recommendations">
@@ -31,10 +62,6 @@
                 <div class="section">
                     <h3>Suivi Complet</h3>
                     <p>Suivez votre progression dans les domaines du sommeil, de la nutrition et de l'exercice.</p>
-                </div>
-                <div class="section">
-                    <h3>Expertise</h3>
-                    <p>Bénéficiez de conseils basés sur des données scientifiques.</p>
                 </div>
             </div>
         </section>
