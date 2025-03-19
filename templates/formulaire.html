@@ -3,60 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire de Recommandations d'Entraînement</title>
+    <title>Formulaire - Coach Sportif</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Entrez vos données pour obtenir une recommandation d'entraînement</h1>
-    <form action="/recommandation" method="POST">
-        <label for="age">Âge :</label>
-        <input type="number" id="age" name="age" required><br><br>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}">Accueil</a></li>
+            <li><a href="{{ url_for('recommendations') }}">Recommandations</a></li>
+            <li><a href="{{ url_for('account') }}">Mon Compte</a></li>
+        </ul>
+    </nav>
 
-        <label for="sexe">Sexe :</label>
-        <select id="sexe" name="sexe" required>
-            <option value="homme">Homme</option>
-            <option value="femme">Femme</option>
-        </select><br><br>
+    <div class="container">
+        <section class="section">
+            <h1>Obtenez vos recommandations personnalisées</h1>
+            
+            <div class="account-form">
+                <form method="POST" action="{{ url_for('recommendations') }}">
+                    <div class="form-group">
+                        <label for="age">Âge</label>
+                        <input type="number" id="age" name="age" required>
+                    </div>
 
-        <label for="poids">Poids (kg) :</label>
-        <input type="number" id="poids" name="poids" required><br><br>
+                    <div class="form-group">
+                        <label for="sexe">Sexe</label>
+                        <select id="sexe" name="sexe" required>
+                            <option value="0">Femme</option>
+                            <option value="1">Homme</option>
+                        </select>
+                    </div>
 
-        <label for="taille">Taille (cm) :</label>
-        <input type="number" id="taille" name="taille" required><br><br>
+                    <div class="form-group">
+                        <label for="poids">Poids (kg)</label>
+                        <input type="number" id="poids" name="poids" step="0.1" required>
+                    </div>
 
-        <label for="objectif">Objectif :</label>
-        <select id="objectif" name="objectif" required>
-            <option value="perte de poids">Perte de poids</option>
-            <option value="gain musculaire">Gain musculaire</option>
-        </select><br><br>
+                    <div class="form-group">
+                        <label for="taille">Taille (cm)</label>
+                        <input type="number" id="taille" name="taille" required>
+                    </div>
 
-        <label for="activite">Niveau d'activité :</label>
-        <select id="activite" name="activite" required>
-            <option value="faible">Faible</option>
-            <option value="moderee">Modéré</option>
-            <option value="eleve">Élevé</option>
-        </select><br><br>
+                    <div class="form-group">
+                        <label for="objectif">Objectif</label>
+                        <select id="objectif" name="objectif" required>
+                            <option value="0">Perte de poids</option>
+                            <option value="1">Prise de masse</option>
+                        </select>
+                    </div>
 
-        <label for="seances_passees">Séances de sport passées (séparées par des virgules) :</label>
-        <input type="text" id="seances_passees" name="seances_passees" placeholder="Course à pied, Yoga, Natation" required><br><br>
+                    <div class="form-group">
+                        <label for="activite">Niveau d'activité</label>
+                        <select id="activite" name="activite" required>
+                            <option value="1">Sédentaire</option>
+                            <option value="2">Modéré</option>
+                            <option value="3">Actif</option>
+                        </select>
+                    </div>
 
-        <label for="sommeil_jour_1">Sommeil Jour 1 (heures) :</label>
-        <input type="number" id="sommeil_jour_1" name="sommeil_jour_1" step="0.1" required><br><br>
-
-        <label for="sommeil_jour_2">Sommeil Jour 2 (heures) :</label>
-        <input type="number" id="sommeil_jour_2" name="sommeil_jour_2" step="0.1" required><br><br>
-
-        <label for="sommeil_jour_3">Sommeil Jour 3 (heures) :</label>
-        <input type="number" id="sommeil_jour_3" name="sommeil_jour_3" step="0.1" required><br><br>
-
-        <label for="sommeil_jour_4">Sommeil Jour 4 (heures) :</label>
-        <input type="number" id="sommeil_jour_4" name="sommeil_jour_4" step="0.1" required><br><br>
-
-        <label for="sommeil_jour_5">Sommeil Jour 5 (heures) :</label>
-        <input type="number" id="sommeil_jour_5" name="sommeil_jour_5" step="0.1" required><br><br>
-
-        <button type="submit">Obtenir la recommandation</button>
-    </form>
-
-    <div id="resultat"></div>
+                    <button type="submit" class="btn">Obtenir mes recommandations</button>
+                </form>
+            </div>
+        </section>
+    </div>
 </body>
 </html>

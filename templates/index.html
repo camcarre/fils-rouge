@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Coach Sportif</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}">Accueil</a></li>
+            <li><a href="{{ url_for('recommendations') }}">Recommandations</a></li>
+            <li><a href="{{ url_for('account') }}">Mon Compte</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Bienvenue sur votre Coach Personnel</h1>
+            <p>Découvrez des recommandations personnalisées pour votre bien-être</p>
+        </section>
+
+        <section class="section">
+            <h2>Pourquoi nous choisir ?</h2>
+            <div class="recommendations">
+                <div class="section">
+                    <h3>Conseils Personnalisés</h3>
+                    <p>Des recommandations adaptées à vos besoins et objectifs personnels.</p>
+                </div>
+                <div class="section">
+                    <h3>Suivi Complet</h3>
+                    <p>Suivez votre progression dans les domaines du sommeil, de la nutrition et de l'exercice.</p>
+                </div>
+                <div class="section">
+                    <h3>Expertise</h3>
+                    <p>Bénéficiez de conseils basés sur des données scientifiques.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
