@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommandations - Coach Sportif</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}">Accueil</a></li>
+            <li><a href="{{ url_for('recommendations') }}">Recommandations</a></li>
+            <li><a href="{{ url_for('account') }}">Mon Compte</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Vos Recommandations Personnalisées</h1>
+
+        <section class="section">
+            <h2>Sommeil</h2>
+            <div class="recommendations">
+                <div class="section">
+                    <h3>Qualité du Sommeil</h3>
+                    <p>{{ sleep_quality }}</p>
+                </div>
+                <div class="section">
+                    <h3>Durée Recommandée</h3>
+                    <p>{{ sleep_duration }}</p>
+                </div>
+                <div class="section">
+                    <h3>Conseils</h3>
+                    <p>{{ sleep_tips }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Menu</h2>
+            <div class="recommendations">
+                <div class="section">
+                    <h3>Plan Alimentaire</h3>
+                    <p>{{ meal_plan }}</p>
+                </div>
+                <div class="section">
+                    <h3>Calories Recommandées</h3>
+                    <p>{{ calories }}</p>
+                </div>
+                <div class="section">
+                    <h3>Conseils Nutritionnels</h3>
+                    <p>{{ nutrition_tips }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Séances</h2>
+            <div class="recommendations">
+                <div class="section">
+                    <h3>Programme d'Entraînement</h3>
+                    <p>{{ training_program }}</p>
+                </div>
+                <div class="section">
+                    <h3>Intensité Recommandée</h3>
+                    <p>{{ training_intensity }}</p>
+                </div>
+                <div class="section">
+                    <h3>Conseils d'Exercice</h3>
+                    <p>{{ exercise_tips }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

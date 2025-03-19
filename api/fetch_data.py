@@ -1,9 +1,6 @@
 import requests
 import sqlite3
-import logging
 from server import afficher_recommandations
-
-logging.basicConfig(level=logging.INFO)
 
 API_URL = 'https://sandbox-api.sahha.ai/api/v1/profile/biomarker/WAJDbLDMeZWbT3AAYEJOE49Ijlg2'
 HEADERS = {
@@ -33,7 +30,8 @@ if response.status_code == 200:
     
     conn.commit()
     conn.close()
-    logging.info('Metrics table cleared and data inserted successfully.')
+
     afficher_recommandations()
+    print('Metrics table cleared and data inserted successfully.')
 else:
     logging.error(f'Error: {response.status_code} - {response.text}')
