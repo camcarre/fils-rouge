@@ -122,19 +122,7 @@ La liste complète est dispo ici : **[https://ollama.ai/models](https://ollama.a
 
 ---
 
-## 💡 **Contribuer & modifier le projet**  
-
-Si tu veux ajouter des trucs ou améliorer le chatbot, hésite pas à :  
-- Ouvrir une **issue** si tu trouves un bug  
-- Faire une **pull request** si t’as du code à proposer  
-
----
-
 ## 🛠️ **Besoin d’aide ?**  
 
 Si t’as un souci ou une question, check d’abord la doc officielle d’Ollama :  
 👉 [https://ollama.ai/docs](https://ollama.ai/docs)  
-
-Sinon, pose ta question sur GitHub ou dans la communauté open-source 🚀  
-
-Bonne exploration ! 🏴‍☠️
