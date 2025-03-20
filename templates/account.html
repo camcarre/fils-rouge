@@ -5,13 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Compte - Coach Sportif</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: white;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #FFA500;
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .nav-links .active {
+            color: #FFA500;
+            border-bottom: 2px solid #FFA500;
+        }
+
+        .logout-btn, .login-btn {
+            color: #333 !important;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 70px;
+        }
+
+        .account-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .account-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #FFA500;
+        }
+
+        .save-button {
+            background: #FFA500;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .save-button:hover {
+            background: #FF8C00;
+        }
+
+        .health-data {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .health-data-item {
+            margin: 0.5rem 0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="{{ url_for('index') }}">Accueil</a></li>
             <li><a href="{{ url_for('recommendations') }}">Recommandations</a></li>
-            <li><a href="{{ url_for('account') }}">Mon Compte</a></li>
+            <li><a href="{{ url_for('account') }}" class="active">Mon Compte</a></li>
+            <li><a href="{{ url_for('chatbot') }}">Chatbot IA</a></li>
             {% if 'user_id' in session %}
                 <li><a href="{{ url_for('logout') }}" class="logout-btn">Déconnexion</a></li>
             {% else %}
@@ -93,7 +220,6 @@
                 </div>
 
                 <div class="dashboard-grid">
-                    <!-- Sleep Section -->
                     <div class="health-card">
                         <h3>Sommeil</h3>
                         <div class="metric-grid" id="sleep-metrics">
@@ -110,13 +236,12 @@
                                 <span class="metric-value" id="deep-sleep"></span>
                             </div>
                             <div class="metric">
-                                <span class="metric-title">Sommeil léger</span>
-                                <span class="metric-value" id="light-sleep"></span>
+                                <span class="metric-title">Conseils IA</span>
+                                <span class="metric-value" id="sleep-ia-recommendation"></span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Activity Section -->
                     <div class="health-card">
                         <h3>Activité</h3>
                         <div class="metric-grid" id="activity-metrics">
@@ -133,30 +258,73 @@
                                 <span class="metric-value" id="floors-climbed"></span>
                             </div>
                             <div class="metric">
+                                <span class="metric-title">Conseils IA</span>
+                                <span class="metric-value" id="nutrition-ia-recommendation"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="health-card">
+                        <h3>Exercice</h3>
+                        <div class="metric-grid" id="exercise-metrics">
+                            <div class="metric">
+                                <span class="metric-title">Pas quotidiens</span>
+                                <span class="metric-value" id="daily-steps"></span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-title">Étages gravis</span>
+                                <span class="metric-value" id="floors-climbed-exercise"></span>
+                            </div>
+                            <div class="metric">
                                 <span class="metric-title">Intensité élevée</span>
                                 <span class="metric-value" id="high-intensity"></span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-title">Conseils IA</span>
+                                <span class="metric-value" id="exercise-ia-recommendation"></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
         <script>
-            // Format time duration from minutes to hours and minutes
             function formatDuration(minutes) {
                 const hours = Math.floor(minutes / 60);
                 const mins = minutes % 60;
                 return `${hours}h ${mins}min`;
             }
 
-            // Format percentage
             function formatPercentage(value) {
                 return `${Math.round(value * 100)}%`;
             }
 
             function updateDashboard(data, date) {
-                // Update date display
+                // Trouver les données pour la date donnée
+                const dailyData = data.donnees_brutes.filter(entry => 
+                    entry.startDateTime.includes(date)
+                );
+
+                // Calculer les métriques
+                const metrics = {
+                    sleep: {
+                        duration: dailyData.find(d => d.type === 'sleep_duration')?.value || 0,
+                        efficiency: dailyData.find(d => d.type === 'sleep_efficiency')?.value || 0,
+                        deep: dailyData.find(d => d.type === 'sleep_deep_duration')?.value || 0
+                    },
+                    activity: {
+                        duration: dailyData.find(d => d.type === 'active_duration')?.value || 0,
+                        calories: dailyData.find(d => d.type === 'active_energy_burned')?.value || 0,
+                        floors: dailyData.find(d => d.type === 'floors_climbed')?.value || 0
+                    },
+                    exercise: {
+                        steps: dailyData.find(d => d.type === 'steps')?.value || 0,
+                        floors: dailyData.find(d => d.type === 'floors_climbed')?.value || 0,
+                        highIntensity: dailyData.find(d => d.type === 'activity_high_intensity_duration')?.value || 0
+                    }
+                };
+
+                // Mettre à jour l'interface
                 document.getElementById('currentDate').textContent = new Date(date).toLocaleDateString('fr-FR', {
                     weekday: 'long',
                     year: 'numeric',
@@ -164,64 +332,40 @@
                     day: 'numeric'
                 });
 
-                // Filter data for the selected date
-                const dayData = data.filter(item => {
-                    const itemDate = new Date(item.startDateTime).toDateString();
-                    return new Date(date).toDateString() === itemDate;
-                });
-
-                // Update sleep metrics
-                const sleepDuration = dayData.find(item => item.type === 'sleep_duration')?.value || '0';
-                const sleepEfficiency = dayData.find(item => item.type === 'sleep_efficiency')?.value || '0';
-                const deepSleep = dayData.find(item => item.type === 'sleep_deep_duration')?.value || '0';
-                const lightSleep = dayData.find(item => item.type === 'sleep_light_duration')?.value || '0';
-
-                document.getElementById('sleep-duration').textContent = formatDuration(parseInt(sleepDuration));
-                document.getElementById('sleep-efficiency').textContent = formatPercentage(parseFloat(sleepEfficiency));
-                document.getElementById('deep-sleep').textContent = formatDuration(parseInt(deepSleep));
-                document.getElementById('light-sleep').textContent = formatDuration(parseInt(lightSleep));
-
-                // Update activity metrics
-                const activeDuration = dayData.find(item => item.type === 'active_duration')?.value || '0';
-                const caloriesBurned = dayData.find(item => item.type === 'active_energy_burned')?.value || '0';
-                const floorsClimbed = dayData.find(item => item.type === 'floors_climbed')?.value || '0';
-                const highIntensity = dayData.find(item => item.type === 'activity_high_intensity_duration')?.value || '0';
-
-                document.getElementById('active-duration').textContent = formatDuration(parseInt(activeDuration));
-                document.getElementById('calories-burned').textContent = `${caloriesBurned} kcal`;
-                document.getElementById('floors-climbed').textContent = `${floorsClimbed} étages`;
-                document.getElementById('high-intensity').textContent = formatDuration(parseInt(highIntensity));
+                document.getElementById('sleep-duration').textContent = formatDuration(metrics.sleep.duration);
+                document.getElementById('sleep-efficiency').textContent = formatPercentage(metrics.sleep.efficiency);
+                document.getElementById('deep-sleep').textContent = formatDuration(metrics.sleep.deep);
+                
+                document.getElementById('active-duration').textContent = formatDuration(metrics.activity.duration);
+                document.getElementById('calories-burned').textContent = `${metrics.activity.calories} kcal`;
+                document.getElementById('floors-climbed').textContent = `${metrics.activity.floors} étages`;
+                
+                document.getElementById('daily-steps').textContent = `${metrics.exercise.steps} pas`;
+                document.getElementById('floors-climbed-exercise').textContent = `${metrics.exercise.floors} étages`;
+                document.getElementById('high-intensity').textContent = formatDuration(metrics.exercise.highIntensity);
             }
 
-            let currentDate = new Date();
+            let currentDate = new Date('2025-03-18'); // Date initiale
             let healthData = [];
 
-            // Fetch and display data
-            fetch('/get_json_data')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    healthData = data;
-                    updateDashboard(data, currentDate);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-
-            // Date navigation
+            // Ajouter les écouteurs d'événements pour les boutons de navigation
             document.getElementById('prevDate').addEventListener('click', () => {
                 currentDate.setDate(currentDate.getDate() - 1);
-                updateDashboard(healthData, currentDate);
+                updateDashboard(healthData, currentDate.toISOString().split('T')[0]);
             });
 
             document.getElementById('nextDate').addEventListener('click', () => {
                 currentDate.setDate(currentDate.getDate() + 1);
-                updateDashboard(healthData, currentDate);
+                updateDashboard(healthData, currentDate.toISOString().split('T')[0]);
             });
+
+            fetch('/get_json_data')
+                .then(response => response.json())
+                .then(data => {
+                    healthData = data;
+                    updateDashboard(data, currentDate.toISOString().split('T')[0]);
+                })
+                .catch(error => console.error('Erreur:', error));
         </script>
     </div>
 </body>

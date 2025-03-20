@@ -4,75 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recommandations - Coach Sportif</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="data:," />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #FFA500;
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .nav-links .active {
+            color: #FFA500;
+            border-bottom: 2px solid #FFA500;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 80px auto 0;
+            padding: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-text {
+            color: #FFA500;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: #eee;
+            margin: 0 auto;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            display: block;
+            width: 40%;
+            height: 100%;
+            background: #FFA500;
+            animation: loading 1s infinite ease-in-out;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(250%); }
+        }
+
+        .recommendation {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .recommendation h2 {
+            color: #333;
+            margin: 0 0 1rem 0;
+        }
+
+        .recommendation p {
+            color: #666;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .error {
+            text-align: center;
+            color: #dc3545;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
-
     <nav class="navbar">
         <ul class="nav-links">
             <li><a href="{{ url_for('index') }}">Accueil</a></li>
-            <li><a href="{{ url_for('recommendations') }}">Recommandations</a></li>
+            <li><a href="{{ url_for('recommendations') }}" class="active">Recommandations</a></li>
             <li><a href="{{ url_for('account') }}">Mon Compte</a></li>
             <li><a href="{{ url_for('chatbot') }}">Chatbot IA</a></li>
+            {% if 'user_id' in session %}
+                <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Connexion</a></li>
+            {% endif %}
         </ul>
     </nav>
 
     <div class="container">
-        <h1>Vos Recommandations Personnalisées</h1>
-
-        <section class="section">
-            <h2>Sommeil</h2>
-            <div class="recommendations">
-                <div class="section">
-                    <h3>Qualité du Sommeil</h3>
-                    <p>{{ sleep_quality }}</p>
-                </div>
-                <div class="section">
-                    <h3>Durée Recommandée</h3>
-                    <p>{{ sleep_duration }}</p>
-                </div>
-                <div class="section">
-                    <h3>Conseils</h3>
-                    <p>{{ sleep_tips }}</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Menu</h2>
-            <div class="recommendations">
-                <div class="section">
-                    <h3>Plan Alimentaire</h3>
-                    <p>{{ meal_plan }}</p>
-                </div>
-                <div class="section">
-                    <h3>Calories Recommandées</h3>
-                    <p>{{ calories }}</p>
-                </div>
-                <div class="section">
-                    <h3>Conseils Nutritionnels</h3>
-                    <p>{{ nutrition_tips }}</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Séances</h2>
-            <div class="recommendations">
-                <div class="section">
-                    <h3>Programme d'Entraînement</h3>
-                    <p>{{ training_program }}</p>
-                </div>
-                <div class="section">
-                    <h3>Intensité Recommandée</h3>
-                    <p>{{ training_intensity }}</p>
-                </div>
-                <div class="section">
-                    <h3>Conseils d'Exercice</h3>
-                    <p>{{ exercise_tips }}</p>
-                </div>
-            </div>
-        </section>
+        <div id="loading" class="loading">
+            <div class="loading-text">Génération des recommandations...</div>
+            <div class="loading-bar"></div>
+        </div>
+        <div id="recommendations"></div>
     </div>
+
+    <script>
+        async function loadRecommendations() {
+            try {
+                const response = await fetch('/recommendations/data');
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                const recommendationsDiv = document.getElementById('recommendations');
+                
+                if (data.error) {
+                    recommendationsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+                    return;
+                }
+
+                Object.entries(data).forEach(([category, content], index) => {
+                    const div = document.createElement('div');
+                    div.className = 'recommendation';
+                    div.style.animationDelay = `${index * 0.2}s`;
+                    
+                    const title = category.charAt(0).toUpperCase() + category.slice(1);
+                    div.innerHTML = `
+                        <h2>${title}</h2>
+                        <p>${content}</p>
+                    `;
+                    
+                    recommendationsDiv.appendChild(div);
+                });
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('recommendations').innerHTML = `
+                    <div class="error">Une erreur est survenue lors du chargement des recommandations.</div>
+                `;
+            }
+        }
+
+        loadRecommendations();
+    </script>
 </body>
 </html>
